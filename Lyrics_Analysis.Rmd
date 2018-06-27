@@ -1,0 +1,39 @@
+---
+title: "Lyrics Analysis"
+output: html_notebook
+---
+
+Lets us read the file.
+
+```{r}
+library(readr)
+lyrics <- read_csv("songdata.csv")
+head(lyrics)
+```
+
+Lets us examine the dimension of the lyrics dataframe.
+
+```{r}
+dim(lyrics)
+```
+
+```{r}
+library(dplyr)
+glimpse(lyrics)
+```
+
+Analysis of 55000+ lyrics data
+- Number of artists
+- Distribution of lyrics length
+- Which artist has highest and lowest number of songs
+- Which songs title has maximum number of words 
+- Which songs title has minimum number of words
+- Which song lyrics has maximum number of words
+- Which song lyrics has minimum number of words
+- Sentiments of the songs (NRC, Bing)
+- Which words are most occuring in the lyrics of the songs
+- Is there a correlation between the words in the songs of same artists?
+- Wordcloud of most popular words in the songs
+- Top words used by an artist in his/her songs
+- Are there some common Rythmic words that repeats again and again?
+
