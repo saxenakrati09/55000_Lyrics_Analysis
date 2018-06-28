@@ -24,12 +24,18 @@ glimpse(lyrics)
 
 Analysis of 55000+ lyrics data
 - Number of artists
+- Which artist has highest and lowest number of songs 
+- Distribution of songs of all artists in the dataset
 - Distribution of lyrics length
-- Which artist has highest and lowest number of songs
-- Which songs title has maximum number of words 
-- Which songs title has minimum number of words
 - Which song lyrics has maximum number of words
 - Which song lyrics has minimum number of words
+- Distribution of words count in title
+- Which songs title has maximum number of words 
+- Which songs title has minimum number of words
+- WordClouds of titles with minimum and maximum lengths
+- Is there a relation between title length and song length?
+
+
 - Sentiments of the songs (NRC, Bing)
 - Which words are most occuring in the lyrics of the songs
 - Is there a correlation between the words in the songs of same artists?
@@ -37,3 +43,192 @@ Analysis of 55000+ lyrics data
 - Top words used by an artist in his/her songs
 - Are there some common Rythmic words that repeats again and again?
 
+
+Let's start with finding out how many artists are listed in the data. Also, how many songs each artist has.
+
+```{r}
+artist<- as.data.frame(table(as.data.frame(lyrics$artist)))
+colnames(artist) <- c("artist", "Num_of_songs")
+head(artist)
+```
+
+Let's see the which artist has most and least number of songs in the dataset.
+
+```{r}
+most_songs <- arrange(artist, desc(Num_of_songs))
+most_songs
+```
+
+```{r fig.width=5, fig.height=3, echo=FALSE}
+library(ggplot2)
+library(Rmisc)
+tilt_theme <- theme(axis.text.x=element_text(angle=45, hjust=1))
+p1 <- ggplot(data = head(most_songs,10), aes(artist, Num_of_songs, fill = Num_of_songs)) +
+      geom_bar(stat = "identity") +
+      geom_text(aes(label=Num_of_songs), vjust=1.6, color="white", size=3) +
+      ggtitle("Artists with most number of songs") +
+      tilt_theme
+p1
+```
+
+```{r}
+least_songs <- tail(most_songs, 15)
+p2 <- ggplot(data = least_songs, aes(artist, Num_of_songs, fill = Num_of_songs)) +
+      geom_bar(stat = "identity") +
+      geom_text(aes(label=Num_of_songs), vjust=1.6, color="white", size=3) +
+      ggtitle("Artists with least number of songs") +
+      tilt_theme
+p2
+```
+
+Let's check the distribution of songs for all artists.
+
+```{r}
+p3 <- ggplot(artist, aes(x=Num_of_songs)) + 
+ geom_histogram(aes(y=..density..), colour="black", fill="white")+
+ geom_density(alpha=.2, fill="red")
+p3
+```
+
+Let's analyze the number of words in each song and its distribution.
+
+```{r}
+library(stringr)
+count_words <- function(vec){
+  return (length(unlist((str_extract_all(tolower(vec), '\\w+')))))
+}
+lyrics$word_count <- sapply(lyrics$text, count_words)
+head(lyrics$word_count)
+```
+
+```{r}
+p4 <- ggplot(lyrics, aes(x=word_count)) + 
+ geom_histogram(aes(y=..density..), colour="black", fill="white")+
+ geom_density(alpha=.2, fill="red")
+p4
+```
+
+Let's check out the songs that are longest and shortest.
+
+```{r}
+longest_song <- arrange(lyrics, desc(word_count))
+longest_song <- head(longest_song, 10)
+shortest_song <- arrange(lyrics, word_count)
+shortest_song <- head(shortest_song, 10)
+longest_song
+shortest_song
+```
+
+```{r}
+p5 <- ggplot(data = longest_song, aes(song, word_count, fill = title_word_count)) +
+      geom_bar(stat = "identity") +
+      geom_text(aes(label=title_word_count), vjust=1.6, color="white", size=3) +
+      ggtitle("Longest Songs") +
+      tilt_theme
+p6 <- ggplot(data = shortest_song, aes(song, word_count, fill = title_word_count)) +
+      geom_bar(position = "dodge", stat = "identity") +
+      geom_text(aes(label = title_word_count), vjust = 1.6, color = "white", size = 3) +
+      ggtitle("Shortest Songs") +
+      tilt_theme
+multiplot(p5, p6, cols=2)
+```
+
+
+Let's analyze the title of the songs, their wordcount and their distribution
+
+```{r}
+lyrics$title_word_count <- sapply(lyrics$song, count_words)
+head(lyrics$title_word_count)
+```
+
+```{r}
+p7 <- ggplot(lyrics, aes(x=title_word_count)) + 
+ geom_histogram(aes(y=..density..), colour="black", fill="white", binwidth = 1, bins = 1)+
+ geom_density(alpha=.2, fill="red")
+p7
+```
+
+WordCloud of popular words from song titles
+
+```{r}
+library(wordcloud)
+library(SnowballC)
+library(RColorBrewer)
+library(tm)
+texts <- lyrics$song
+#texts <- iconv(texts, to = "utf-8")
+corpus <- Corpus(VectorSource(texts))
+corpus <- tm_map(corpus, PlainTextDocument)
+corpus <- tm_map(corpus, removePunctuation)
+corpus <- tm_map(corpus, removeWords, stopwords('english'))
+corpus <- tm_map(corpus, stemDocument)
+corpus <- tm_map(corpus, removeWords, c("and", "this", "there")) 
+corpus <- Corpus(VectorSource(corpus))
+dtm <- TermDocumentMatrix(corpus)
+m <- as.matrix(dtm)
+v <- sort(rowSums(m),decreasing=TRUE)
+d <- data.frame(word = names(v),freq=v)
+head(d, 10)
+d <- d[-which(d$word %in% c("and","this","that")),]
+set.seed(1234)
+wordcloud(words = d$word, freq = d$freq, min.freq = 1,
+          max.words=200, random.order=FALSE, rot.per=0.35, 
+          colors=brewer.pal(8, "Dark2"))
+```
+
+There are many song titles that are of length 1, 2 and 3. But surprisingly, there are titles of length more than 13 too. Let's check them out.
+
+```{r}
+longest_title <- subset(lyrics, lyrics$title_word_count > 13)
+longest_title
+shortest_title <- subset(lyrics, lyrics$title_word_count == 1)
+shortest_title
+```
+
+There are 8 songs with title length more than 13 and 8342 songs with single word title. Let's see word cloud of single word titles and longest titles
+
+```{r}
+texts <- longest_title$song
+corpus <- Corpus(VectorSource(texts))
+corpus <- tm_map(corpus, PlainTextDocument)
+corpus <- Corpus(VectorSource(corpus))
+dtm <- TermDocumentMatrix(corpus)
+m <- as.matrix(dtm)
+v <- sort(rowSums(m),decreasing=TRUE)
+d <- data.frame(word = names(v),freq=v)
+head(d, 10)
+set.seed(1234)
+wordcloud(words = d$word, freq = d$freq, min.freq = 1,scale=c(2,0.5),
+          max.words=100, random.order=FALSE, rot.per=0.35, 
+          colors=brewer.pal(8, "Dark2"))
+```
+
+```{r}
+texts <- shortest_title$song
+corpus <- Corpus(VectorSource(texts))
+corpus <- tm_map(corpus, PlainTextDocument)
+corpus <- Corpus(VectorSource(corpus))
+dtm <- TermDocumentMatrix(corpus)
+m <- as.matrix(dtm)
+v <- sort(rowSums(m),decreasing=TRUE)
+d <- data.frame(word = names(v),freq=v)
+head(d, 10)
+set.seed(1234)
+wordcloud(words = d$word, freq = d$freq, min.freq = 1,scale=c(2,0.5),
+          max.words=100, random.order=FALSE, rot.per=0.35, 
+          colors=brewer.pal(8, "Dark2"))
+```
+
+An interesting questin would be is there relation between length of title and songs? Most probably now, but let's check out.
+
+```{r}
+p8 <- ggplot(lyrics, aes(x=factor(title_word_count), y=word_count, fill = factor(title_word_count))) + 
+  geom_boxplot() 
+p8 
+```
+
+```{r}
+cor(lyrics$title_word_count, lyrics$word_count)
+```
+ As expected, there is no correlatin between these two quantitites.
+ 
