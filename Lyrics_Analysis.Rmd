@@ -423,6 +423,55 @@ multiplot(p9, p10, p11, p12, p13, p14, p15, p16, layout = matrix(c(1,2,3,4,5,6,7
 
 ```
 
+Let's plot the wordcloud for each category
+
+```{r fig.width=5, fig.height=8, echo=FALSE}
+
+#Create two panels to add the word clouds to
+par(mfrow=c(4,2))
+
+wordcloud(words = joy$word, freq = joy$Freq, min.freq = 50,
+          max.words=100, scale=c(2, 1), random.order = FALSE, random.color = FALSE, rot.per=0.35, 
+          colors=brewer.pal(8, "Dark2"))
+title("Joy words", outer=FALSE)
+          #colors= c("indianred1","indianred2","indianred3","indianred"))
+
+wordcloud(words = trust$word, freq = trust$Freq, min.freq = 50,
+          max.words=100, scale=c(2, 1), random.order = FALSE, random.color = FALSE, rot.per=0.35, 
+          colors=brewer.pal(8, "Dark2"))
+title("Trust words", outer=FALSE)
+
+wordcloud(words = fear$word, freq = fear$Freq, min.freq = 50,
+          max.words=100, scale=c(2, 1), random.order = FALSE, random.color = FALSE, rot.per=0.35, 
+          colors=brewer.pal(8, "Dark2"))
+title("Fear words", outer=FALSE)
+
+wordcloud(words = sadness$word, freq = sadness$Freq, min.freq = 50,
+          max.words=100, scale=c(2, 1), random.order = FALSE, random.color = FALSE, rot.per=0.35, 
+          colors=brewer.pal(8, "Dark2"))
+title("Sadness words", outer=FALSE)
+
+wordcloud(words = anger$word, freq = anger$Freq, min.freq = 50,
+          max.words=100, scale=c(2, 1), random.order = FALSE, random.color = FALSE, rot.per=0.35, 
+          colors=brewer.pal(8, "Dark2"))
+title("Anger words", outer=FALSE)
+
+wordcloud(words = surprise$word, freq = surprise$Freq, min.freq = 50,
+          max.words=100, scale=c(2, 1), random.order = FALSE, random.color = FALSE, rot.per=0.35, 
+          colors=brewer.pal(8, "Dark2"))
+title("Surprise words", outer=FALSE)
+
+wordcloud(words = disgust$word, freq = disgust$Freq, min.freq = 50,
+          max.words=100, scale=c(2, 1), random.order = FALSE, random.color = FALSE, rot.per=0.35, 
+          colors=brewer.pal(8, "Dark2"))
+title("Disgust words", outer=FALSE)
+
+wordcloud(words = anticipation$word, freq = anticipation$Freq, min.freq = 50,
+          max.words=100, scale=c(2, 1), random.order = FALSE, random.color = FALSE, rot.per=0.35, 
+          colors=brewer.pal(8, "Dark2"))
+title("Anticipation words", outer=FALSE)
+```
+
 Let us check top words that depicts "positive" and "negative" sentiments in NRC Sentiment category.
 
 ```{r fig.width=5, fig.height=2, echo=FALSE}
@@ -452,6 +501,9 @@ p18 <- ggplot(data = tail(neg, 20), aes(word, Freq, fill = word)) +
       tilt_theme
 multiplot(p17, p18, cols=2)
 ```
+
+
+
 
 Let us check top words that depicts "positive" and "negative" sentiments in bing Sentiment category.
 
@@ -509,4 +561,485 @@ multiplot(p19, p20,p21, p22,layout = matrix(c(1,2,3,4), nrow=2, byrow=TRUE))
 ```
 
 It can be seen that positive and negative words are different for all three lexicons. 
+
+Let's plot positive and negative word cloud
+
+
+```{r fig.width=5, fig.height=7, echo=FALSE}
+
+#Create two panels to add the word clouds to
+par(mfrow=c(3,2))
+#Create word cloud of positive words of NRC lexicon
+wordcloud(words = pos$word, freq = pos$Freq, min.freq = 50,
+          max.words=100, scale=c(2, 1), random.order = FALSE, random.color = FALSE, rot.per=0.35, 
+          colors=brewer.pal(8, "Dark2"))
+title("Positive words in NRC Lexicon", outer=FALSE)
+          #colors= c("indianred1","indianred2","indianred3","indianred"))
+#Create word cloud of negative words of NRC lexicon
+wordcloud(words = neg$word, freq = neg$Freq, min.freq = 50,
+          max.words=100, scale=c(2, 1), random.order = FALSE, random.color = FALSE, rot.per=0.35, 
+          colors=brewer.pal(8, "Accent"))
+title("Negative words in NRC Lexicon", outer=FALSE)
+#Create word cloud of positive words of bing lexicon
+wordcloud(words = pos_b$word, freq = pos_b$Freq, min.freq = 50,
+          max.words=100, scale=c(2, 1), random.order = FALSE, random.color = FALSE, rot.per=0.35, 
+          colors=brewer.pal(8, "Dark2"))
+title("Positive words in Bing Lexicon", outer=FALSE)
+#Create word cloud of negative words of bing lexicon
+wordcloud(words = neg_b$word, freq = neg_b$Freq, min.freq = 50,
+          max.words=100, scale=c(2, 1), random.order = FALSE, random.color = FALSE, rot.per=0.35, 
+          colors=brewer.pal(8, "Accent"))
+title("Negative words in Bing Lexicon", outer=FALSE)
+#Create word cloud of positive words of loughran lexicon
+wordcloud(words = pos_l$word, freq = pos_l$Freq, min.freq = 50,
+          max.words=100, scale=c(2, 1), random.order = FALSE, random.color = FALSE, rot.per=0.35, 
+          colors=brewer.pal(8, "Dark2"))
+title("Positive words in Loughran Lexicon", outer=FALSE)
+#Create word cloud of negative words of loughran lexicon
+wordcloud(words = neg_l$word, freq = neg_l$Freq, min.freq = 50,
+          max.words=100, scale=c(2, 1), random.order = FALSE, random.color = FALSE, rot.per=0.35, 
+          colors=brewer.pal(8, "Accent"))
+title("Negative words in Loughran Lexicon", outer=FALSE)
+```
+
+
+Let's check songs based on NRC sentiment (except positive and negative)
+
+```{r}
+lyrics_words <- select(lyrics, c("artist", "song","text"))
+lyrics_words <- lyrics_words %>% unnest_tokens(word, text)
+head(lyrics_words)
+dim(lyrics_words)
+```
+
+```{r}
+joy_s <- lyrics_words %>%
+  inner_join(get_sentiments("nrc") %>% 
+  filter(sentiment == "joy")) 
+joy_s <- as.data.frame(sort(table(joy_s$song)))
+columns_sentiment <- c("Song", "Freq")
+colnames(joy_s) <- columns_sentiment
+tail(joy_s, 10)
+
+trust_s <- lyrics_words %>%
+  inner_join(get_sentiments("nrc") %>% 
+  filter(sentiment == "trust")) 
+trust_s <- as.data.frame(sort(table(trust_s$song)))
+colnames(trust_s) <- columns_sentiment
+tail(trust_s, 10)
+
+fear_s <- lyrics_words %>%
+  inner_join(get_sentiments("nrc") %>% 
+  filter(sentiment == "fear")) 
+fear_s <- as.data.frame(sort(table(fear_s$song)))
+colnames(fear_s) <- columns_sentiment
+
+sadness_s <- lyrics_words %>%
+  inner_join(get_sentiments("nrc") %>% 
+  filter(sentiment == "sadness")) 
+sadness_s <- as.data.frame(sort(table(sadness_s$song)))
+colnames(sadness_s) <- columns_sentiment
+
+anger_s <- lyrics_words %>%
+  inner_join(get_sentiments("nrc") %>% 
+  filter(sentiment == "anger")) 
+anger_s <- as.data.frame(sort(table(anger_s$song)))
+colnames(anger_s) <- columns_sentiment
+
+surprise_s <- lyrics_words %>%
+  inner_join(get_sentiments("nrc") %>% 
+  filter(sentiment == "surprise")) 
+surprise_s <- as.data.frame(sort(table(surprise_s$song)))
+colnames(surprise_s) <- columns_sentiment
+
+disgust_s <- lyrics_words %>%
+  inner_join(get_sentiments("nrc") %>% 
+  filter(sentiment == "disgust")) 
+disgust_s <- as.data.frame(sort(table(disgust_s$song)))
+colnames(disgust_s) <- columns_sentiment
+
+anticipation_s <- lyrics_words %>%
+  inner_join(get_sentiments("nrc") %>% 
+  filter(sentiment == "anticipation")) 
+anticipation_s <- as.data.frame(sort(table(anticipation_s$song)))
+colnames(anticipation_s) <- columns_sentiment
+```
+
+Let's plot the top 10 songs in each category
+
+
+```{r fig.width=8, fig.height=4, echo=FALSE}
+p23 <- ggplot(data = tail(joy_s, 10), aes(Song, Freq, fill = Song)) +
+      geom_bar(position = "dodge", stat = "identity") +
+      geom_text(aes(label = Freq), vjust = 1.6, color = "black", size = 3) +
+      ggtitle("Joy") +
+      guides(fill=FALSE) + coord_flip() +
+      tilt_theme
+p24 <- ggplot(data = tail(trust_s, 10), aes(Song, Freq, fill = Song)) +
+      geom_bar(position = "dodge", stat = "identity") +
+      geom_text(aes(label = Freq), vjust = 1.6, color = "black", size = 3) +
+      ggtitle("Trust") +
+      guides(fill=FALSE) + coord_flip() +
+      tilt_theme
+p25 <- ggplot(data = tail(fear_s, 10), aes(Song, Freq, fill = Song)) +
+      geom_bar(position = "dodge", stat = "identity") +
+      geom_text(aes(label = Freq), vjust = 1.6, color = "black", size = 3) +
+      ggtitle("Fear") +
+      guides(fill=FALSE) + coord_flip() +
+      tilt_theme
+p26 <- ggplot(data = tail(sadness_s, 10), aes(Song, Freq, fill = Song)) +
+      geom_bar(position = "dodge", stat = "identity") +
+      geom_text(aes(label = Freq), vjust = 1.6, color = "black", size = 3) +
+      ggtitle("Sadness") +
+      guides(fill=FALSE) + coord_flip() +
+      tilt_theme
+p27 <- ggplot(data = tail(anger_s, 10), aes(Song, Freq, fill = Song)) +
+      geom_bar(position = "dodge", stat = "identity") +
+      geom_text(aes(label = Freq), vjust = 1.6, color = "black", size = 3) +
+      ggtitle("Anger") +
+      guides(fill=FALSE) + coord_flip() +
+      tilt_theme
+p28 <- ggplot(data = tail(surprise_s, 10), aes(Song, Freq, fill = Song)) +
+      geom_bar(position = "dodge", stat = "identity") +
+      geom_text(aes(label = Freq), vjust = 1.6, color = "black", size = 3) +
+      ggtitle("Surprise") +
+      guides(fill=FALSE) + coord_flip() +
+      tilt_theme
+p29 <- ggplot(data = tail(disgust_s, 10), aes(Song, Freq, fill = Song)) +
+      geom_bar(position = "dodge", stat = "identity") +
+      geom_text(aes(label = Freq), vjust = 1.6, color = "black", size = 3) +
+      ggtitle("Disgust") +
+      guides(fill=FALSE) + coord_flip() +
+      tilt_theme
+p30 <- ggplot(data = tail(anticipation_s, 10), aes(Song, Freq, fill = Song)) +
+      geom_bar(position = "dodge", stat = "identity") +
+      geom_text(aes(label = Freq), vjust = 1.6, color = "black", size = 3) +
+      ggtitle("Anticipation") +
+      guides(fill=FALSE) + coord_flip() +
+      tilt_theme
+
+multiplot(p23, p24, p25, p26, p27, p28, p29,p30, layout = matrix(c(1,2,3,4,5,6,7,8), nrow=2, byrow=TRUE))
+
+```
+
+
+
+Let's do the same for Positive and Negative sentiment in NRC lexicon cateogory.
+```{r fig.width=5, fig.height=2, echo=FALSE}
+pos_s <- lyrics_words %>%
+  inner_join(get_sentiments("nrc") %>% 
+  filter(sentiment == "positive")) 
+pos_s <- as.data.frame(sort(table(pos_s$song)))
+colnames(pos_s) <- columns_sentiment
+
+neg_s <- lyrics_words %>%
+  inner_join(get_sentiments("nrc") %>% 
+  filter(sentiment == "negative")) 
+neg_s <- as.data.frame(sort(table(neg_s$song)))
+colnames(neg_s) <- columns_sentiment
+
+p31 <- ggplot(data = tail(pos_s, 20), aes(Song, Freq, fill = Song)) +
+      geom_bar(position = "dodge", stat = "identity") +
+      geom_text(aes(label = Freq), color = "black", size = 3) +
+      ggtitle("Positive (NRC)") +
+      guides(fill=FALSE) + coord_flip() +
+      tilt_theme
+p32 <- ggplot(data = tail(neg_s, 20), aes(Song, Freq, fill = Song)) +
+      geom_bar(position = "dodge", stat = "identity") +
+      geom_text(aes(label = Freq) , color = "black", size = 3) +
+      ggtitle("Negative (NRC)") +
+      guides(fill=FALSE) + coord_flip() +
+      tilt_theme
+multiplot(p31, p32, cols=2)
+```
+
+Let us find positive and negative songs based on bing and loughran lexicon cateogories.
+
+```{r fig.width=10, fig.height=5, echo=FALSE}
+pos_bs <- lyrics_words %>%
+  inner_join(get_sentiments("bing") %>% 
+  filter(sentiment == "positive")) 
+pos_bs <- as.data.frame(sort(table(pos_bs$song)))
+colnames(pos_bs) <- columns_sentiment
+
+neg_bs <- lyrics_words %>%
+  inner_join(get_sentiments("bing") %>% 
+  filter(sentiment == "negative")) 
+neg_bs <- as.data.frame(sort(table(neg_bs$song)))
+colnames(neg_bs) <- columns_sentiment
+
+pos_ls <- lyrics_words %>% 
+  inner_join(get_sentiments("loughran") %>% 
+  filter(sentiment == "positive")) 
+pos_ls <- as.data.frame(sort(table(pos_ls$song)))
+colnames(pos_ls) <- columns_sentiment
+
+neg_ls <- lyrics_words %>%
+  inner_join(get_sentiments("loughran") %>% 
+  filter(sentiment == "negative")) 
+neg_ls <- as.data.frame(sort(table(neg_ls$song)))
+colnames(neg_ls) <- columns_sentiment
+
+p33 <- ggplot(data = tail(pos_bs, 20), aes(Song, Freq, fill = Song)) +
+      geom_bar(position = "dodge", stat = "identity") +
+      geom_text(aes(label = Freq), color = "black", size = 3) +
+      ggtitle("Positive (BING)") +
+      guides(fill=FALSE) + coord_flip() +
+      tilt_theme
+p34 <- ggplot(data = tail(neg_bs, 20), aes(Song, Freq, fill = Song)) +
+      geom_bar(position = "dodge", stat = "identity") +
+      geom_text(aes(label = Freq), color = "black", size = 3) +
+      ggtitle("Negative (BING)") +
+      guides(fill=FALSE) + coord_flip() +
+      tilt_theme
+p35 <- ggplot(data = tail(pos_ls, 20), aes(Song, Freq, fill = Song)) +
+      geom_bar(position = "dodge", stat = "identity") +
+      geom_text(aes(label = Freq), color = "black", size = 3) +
+      ggtitle("Positive (LOUGHRAN)") +
+      guides(fill=FALSE) + coord_flip() +
+      tilt_theme
+p36 <- ggplot(data = tail(neg_ls, 20), aes(Song, Freq, fill = Song)) +
+      geom_bar(position = "dodge", stat = "identity") +
+      geom_text(aes(label = Freq), color = "black", size = 3) +
+      ggtitle("Negative (LOUGHRAN)") +
+      guides(fill=FALSE) + coord_flip() +
+      tilt_theme
+multiplot(p33, p34,p35, p36,layout = matrix(c(1,2,3,4), nrow=2, byrow=TRUE))
+
+```
+
+The positive and negative songs in each category are different. This is something known already, since the positive words and negative words in ech categories were also different.
+
+The same analysis can be done for artists. Let's check out artists who write most songs in each NRC lexicon sentiment cateogry.
+
+```{r}
+joy_a <- lyrics_words %>%
+  inner_join(get_sentiments("nrc") %>% 
+  filter(sentiment == "joy")) 
+joy_a <- as.data.frame(sort(table(joy_a$artist)))
+columns_sentiment <- c("artist", "Freq")
+colnames(joy_a) <- columns_sentiment
+tail(joy_a, 10)
+
+trust_a <- lyrics_words %>%
+  inner_join(get_sentiments("nrc") %>% 
+  filter(sentiment == "trust")) 
+trust_a <- as.data.frame(sort(table(trust_a$artist)))
+colnames(trust_a) <- columns_sentiment
+tail(trust_a, 10)
+
+fear_a <- lyrics_words %>%
+  inner_join(get_sentiments("nrc") %>% 
+  filter(sentiment == "fear")) 
+fear_a <- as.data.frame(sort(table(fear_a$artist)))
+colnames(fear_a) <- columns_sentiment
+
+sadness_a <- lyrics_words %>%
+  inner_join(get_sentiments("nrc") %>% 
+  filter(sentiment == "sadness")) 
+sadness_a <- as.data.frame(sort(table(sadness_a$artist)))
+colnames(sadness_a) <- columns_sentiment
+
+anger_a <- lyrics_words %>%
+  inner_join(get_sentiments("nrc") %>% 
+  filter(sentiment == "anger")) 
+anger_a <- as.data.frame(sort(table(anger_a$artist)))
+colnames(anger_a) <- columns_sentiment
+
+surprise_a <- lyrics_words %>%
+  inner_join(get_sentiments("nrc") %>% 
+  filter(sentiment == "surprise")) 
+surprise_a <- as.data.frame(sort(table(surprise_a$artist)))
+colnames(surprise_a) <- columns_sentiment
+
+disgust_a <- lyrics_words %>%
+  inner_join(get_sentiments("nrc") %>% 
+  filter(sentiment == "disgust")) 
+disgust_a <- as.data.frame(sort(table(disgust_a$artist)))
+colnames(disgust_a) <- columns_sentiment
+
+anticipation_a <- lyrics_words %>%
+  inner_join(get_sentiments("nrc") %>% 
+  filter(sentiment == "anticipation")) 
+anticipation_a <- as.data.frame(sort(table(anticipation_a$artist)))
+colnames(anticipation_a) <- columns_sentiment
+```
+
+Let's plot the top 10 artists in each category
+
+
+```{r fig.width=8, fig.height=4, echo=FALSE}
+p37 <- ggplot(data = tail(joy_a, 10), aes(artist, Freq, fill = artist)) +
+      geom_bar(position = "dodge", stat = "identity") +
+      geom_text(aes(label = Freq), color = "black", size = 3) +
+      ggtitle("Joy") +
+      guides(fill=FALSE) + coord_flip() +
+      tilt_theme
+p38 <- ggplot(data = tail(trust_a, 10), aes(artist, Freq, fill = artist)) +
+      geom_bar(position = "dodge", stat = "identity") +
+      geom_text(aes(label = Freq), color = "black", size = 3) +
+      ggtitle("Trust") +
+      guides(fill=FALSE) + coord_flip() +
+      tilt_theme
+p39 <- ggplot(data = tail(fear_a, 10), aes(artist, Freq, fill = artist)) +
+      geom_bar(position = "dodge", stat = "identity") +
+      geom_text(aes(label = Freq), color = "black", size = 3) +
+      ggtitle("Fear") +
+      guides(fill=FALSE) + coord_flip() +
+      tilt_theme
+p40 <- ggplot(data = tail(sadness_a, 10), aes(artist, Freq, fill = artist)) +
+      geom_bar(position = "dodge", stat = "identity") +
+      geom_text(aes(label = Freq), color = "black", size = 3) +
+      ggtitle("Sadness") +
+      guides(fill=FALSE) + coord_flip() +
+      tilt_theme
+p41 <- ggplot(data = tail(anger_a, 10), aes(artist, Freq, fill = artist)) +
+      geom_bar(position = "dodge", stat = "identity") +
+      geom_text(aes(label = Freq), color = "black", size = 3) +
+      ggtitle("Anger") +
+      guides(fill=FALSE) + coord_flip() +
+      tilt_theme
+p42 <- ggplot(data = tail(surprise_a, 10), aes(artist, Freq, fill = artist)) +
+      geom_bar(position = "dodge", stat = "identity") +
+      geom_text(aes(label = Freq), color = "black", size = 3) +
+      ggtitle("Surprise") +
+      guides(fill=FALSE) + coord_flip() +
+      tilt_theme
+p43 <- ggplot(data = tail(disgust_a, 10), aes(artist, Freq, fill = artist)) +
+      geom_bar(position = "dodge", stat = "identity") +
+      geom_text(aes(label = Freq),color = "black", size = 3) +
+      ggtitle("Disgust") +
+      guides(fill=FALSE) + coord_flip() +
+      tilt_theme
+p44 <- ggplot(data = tail(anticipation_a, 10), aes(artist, Freq, fill = artist)) +
+      geom_bar(position = "dodge", stat = "identity") +
+      geom_text(aes(label = Freq), color = "black", size = 3) +
+      ggtitle("Anticipation") +
+      guides(fill=FALSE) + coord_flip() +
+      tilt_theme
+
+multiplot(p37, p38, p39, p40, p41, p42, p43, p44, layout = matrix(c(1,2,3,4,5,6,7,8), nrow=2, byrow=TRUE))
+
+```
+
+Let's do the same for Positive and Negative sentiment in NRC lexicon cateogory.
+```{r fig.width=5, fig.height=2, echo=FALSE}
+pos_a <- lyrics_words %>%
+  inner_join(get_sentiments("nrc") %>% 
+  filter(sentiment == "positive")) 
+pos_a <- as.data.frame(sort(table(pos_a$artist)))
+colnames(pos_a) <- columns_sentiment
+
+neg_a <- lyrics_words %>%
+  inner_join(get_sentiments("nrc") %>% 
+  filter(sentiment == "negative")) 
+neg_a <- as.data.frame(sort(table(neg_a$artist)))
+colnames(neg_a) <- columns_sentiment
+
+p45 <- ggplot(data = tail(pos_a, 15), aes(artist, Freq, fill = artist)) +
+      geom_bar(position = "dodge", stat = "identity") +
+      geom_text(aes(label = Freq), color = "black", size = 3) +
+      ggtitle("Positive (NRC)") +
+      guides(fill=FALSE) + coord_flip() +
+      tilt_theme
+p46 <- ggplot(data = tail(neg_a, 15), aes(artist, Freq, fill = artist)) +
+      geom_bar(position = "dodge", stat = "identity") +
+      geom_text(aes(label = Freq) , color = "black", size = 3) +
+      ggtitle("Negative (NRC)") +
+      guides(fill=FALSE) + coord_flip() +
+      tilt_theme
+multiplot(p45, p46, cols=2)
+```
+
+Let us find positive and negative songs based on bing and loughran lexicon cateogories.
+
+```{r fig.width=10, fig.height=5, echo=FALSE}
+pos_ba <- lyrics_words %>%
+  inner_join(get_sentiments("bing") %>% 
+  filter(sentiment == "positive")) 
+pos_ba <- as.data.frame(sort(table(pos_ba$artist)))
+colnames(pos_ba) <- columns_sentiment
+
+neg_ba <- lyrics_words %>%
+  inner_join(get_sentiments("bing") %>% 
+  filter(sentiment == "negative")) 
+neg_ba <- as.data.frame(sort(table(neg_ba$artist)))
+colnames(neg_ba) <- columns_sentiment
+
+pos_la <- lyrics_words %>% 
+  inner_join(get_sentiments("loughran") %>% 
+  filter(sentiment == "positive")) 
+pos_la <- as.data.frame(sort(table(pos_la$artist)))
+colnames(pos_la) <- columns_sentiment
+
+neg_la <- lyrics_words %>%
+  inner_join(get_sentiments("loughran") %>% 
+  filter(sentiment == "negative")) 
+neg_la <- as.data.frame(sort(table(neg_la$artist)))
+colnames(neg_la) <- columns_sentiment
+
+p47 <- ggplot(data = tail(pos_ba, 15), aes(artist, Freq, fill = artist)) +
+      geom_bar(position = "dodge", stat = "identity") +
+      geom_text(aes(label = Freq), color = "black", size = 3) +
+      ggtitle("Positive (BING)") +
+      guides(fill=FALSE) + coord_flip() +
+      tilt_theme
+p48 <- ggplot(data = tail(neg_ba, 15), aes(artist, Freq, fill = artist)) +
+      geom_bar(position = "dodge", stat = "identity") +
+      geom_text(aes(label = Freq), color = "black", size = 3) +
+      ggtitle("Negative (BING)") +
+      guides(fill=FALSE) + coord_flip() +
+      tilt_theme
+p49 <- ggplot(data = tail(pos_la, 15), aes(artist, Freq, fill = artist)) +
+      geom_bar(position = "dodge", stat = "identity") +
+      geom_text(aes(label = Freq), color = "black", size = 3) +
+      ggtitle("Positive (LOUGHRAN)") +
+      guides(fill=FALSE) + coord_flip() +
+      tilt_theme
+p50 <- ggplot(data = tail(neg_la, 15), aes(artist, Freq, fill = artist)) +
+      geom_bar(position = "dodge", stat = "identity") +
+      geom_text(aes(label = Freq), color = "black", size = 3) +
+      ggtitle("Negative (LOUGHRAN)") +
+      guides(fill=FALSE) + coord_flip() +
+      tilt_theme
+multiplot(p47, p48,p49, p50,layout = matrix(c(1,2,3,4), nrow=2, byrow=TRUE))
+
+```
+
+Let's check out bigrams in the songs lyrics
+
+```{r echo=FALSE}
+lyrics_bigram <- unnest_tokens(lyrics, input = text, output = bigram, token = "ngrams", n=2)
+
+
+bigram_filtered<-lyrics_bigram %>%separate(bigram,c("word1","word2",sep=" "))%>%
+filter(!word1 %in% stop_words$word) %>%
+  filter(!word2 %in% stop_words$word)
+  
+ 
+  bigram_united <- bigram_filtered %>%
+  unite(bigram, word1, word2, sep = " ")
+head(bigram_united)
+
+
+```
+
+```{r}
+  
+bigram_counts <- bigram_united %>% 
+  count(bigram, sort = TRUE)
+  head(bigram_counts) 
+  
+   
+  bigram_counts %>% arrange(desc(n))%>% head(20)%>%ggplot(aes(x=factor(bigram,levels=bigram),y=n))+geom_bar(stat="identity",fill="#FF3E45")+labs(title="Top 20 bigram words in Songs")+coord_flip()
+  
+ 
+  wordcloud(bigram_counts$bigram,bigram_counts$n,max.words=50,random.order = F,colors=c("#9E0142", "#D53E4F", "#F46D43" ,"#FDAE61", "#FEE08B", "#E6F598" ,"#ABDDA4" ,"#66C2A5" ,"#3288BD", "#5E4FA2"))
+title(main="Bigram wordcloud")
+```
+
+
+
+
+
 
