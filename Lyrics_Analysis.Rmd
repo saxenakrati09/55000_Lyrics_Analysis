@@ -34,11 +34,8 @@ Analysis of 55000+ lyrics data
 - Which songs title has minimum number of words
 - WordClouds of titles with minimum and maximum lengths
 - Is there a relation between title length and song length?
-
-
 - Sentiments of the songs (NRC, Bing)
 - Which words are most occuring in the lyrics of the songs
-- Is there a correlation between the words in the songs of same artists?
 - Wordcloud of most popular words in the songs
 - Top words used by an artist in his/her songs
 - Are there some common Rythmic words that repeats again and again?
@@ -1024,22 +1021,91 @@ head(bigram_united)
 
 ```
 
+
 ```{r}
-  
-bigram_counts <- bigram_united %>% 
-  count(bigram, sort = TRUE)
-  head(bigram_counts) 
-  
-   
-  bigram_counts %>% arrange(desc(n))%>% head(20)%>%ggplot(aes(x=factor(bigram,levels=bigram),y=n))+geom_bar(stat="identity",fill="#FF3E45")+labs(title="Top 20 bigram words in Songs")+coord_flip()
-  
- 
-  wordcloud(bigram_counts$bigram,bigram_counts$n,max.words=50,random.order = F,colors=c("#9E0142", "#D53E4F", "#F46D43" ,"#FDAE61", "#FEE08B", "#E6F598" ,"#ABDDA4" ,"#66C2A5" ,"#3288BD", "#5E4FA2"))
+bigram_counts <- as.data.frame(sort(table(bigram_united$bigram)))
+colnames(bigram_counts) <- c("bigrams", "Freq")
+bigram_counts_head <- bigram_counts %>% arrange(desc(Freq))%>% head(15)
+bigram_counts_head
+
+p51 <- ggplot(data = bigram_counts_head, aes(bigrams, Freq, fill = bigrams)) +
+      geom_bar(position = "dodge", stat = "identity") +
+      geom_text(aes(label = Freq), color = "black", size = 3) +
+      ggtitle("Top 15 bigrams in songs") +
+      guides(fill=FALSE) + coord_flip() +
+      tilt_theme
+p51
+```
+
+```{r}
+ wordcloud(bigram_counts$bigrams,bigram_counts$Freq,max.words=100,random.order = F,colors=brewer.pal(8, "Dark2"))
 title(main="Bigram wordcloud")
 ```
 
+Let's check out trigrams in the lyrics of songs.
+```{r echo=FALSE}
+lyrics_trigram <- unnest_tokens(lyrics, input = text, output = trigram, token = "ngrams", n=3)
 
 
+trigram_filtered<-lyrics_trigram %>%separate(trigram,c("word1","word2","word3",sep=" "))%>%
+filter(!word1 %in% stop_words$word) %>%
+  filter(!word2 %in% stop_words$word) %>%
+  filter(!word3 %in% stop_words$word)
+  
+ 
+  trigram_united <- trigram_filtered %>%
+  unite(trigram, word1, word2,word3, sep = " ")
+```  
 
+```{r}
+trigram_counts <- as.data.frame(sort(table(trigram_united$trigram)))
+colnames(trigram_counts) <- c("trigrams", "Freq")
+trigram_counts_head <- trigram_counts %>% arrange(desc(Freq))%>% head(15)
+trigram_counts_head
+
+p52 <- ggplot(data = trigram_counts_head, aes(trigrams, Freq, fill = trigrams)) +
+      geom_bar(position = "dodge", stat = "identity") +
+      geom_text(aes(label = Freq), color = "black", size = 3) +
+      ggtitle("Top 15 trigrams in songs") +
+      guides(fill=FALSE) + coord_flip() +
+      tilt_theme
+p52
+ 
+wordcloud(trigram_counts$trigrams,trigram_counts$Freq,max.words=100,random.order = F,colors=brewer.pal(8, "Dark2"))
+title(main="Trigram wordcloud")
+```
+
+Let us find out top words used by any artist in their songs.
+
+```{r}
+get_wordcloud_of_artist_songs <- function(artist_name){
+artist_songs <- filter(lyrics, lyrics$artist == artist_name)
+texts <- artist_songs$text
+corpus <- Corpus(VectorSource(texts))
+corpus <- tm_map(corpus, PlainTextDocument)
+corpus <- Corpus(VectorSource(corpus))
+dtm <- TermDocumentMatrix(corpus)
+m <- as.matrix(dtm)
+v <- sort(rowSums(m),decreasing=TRUE)
+d <- data.frame(word = names(v),freq=v)
+head(d, 10)
+set.seed(1234)
+wordcloud(words = d$word, freq = d$freq, min.freq = 1,scale=c(2,1),
+          max.words=100, random.order=FALSE, rot.per=0.35, 
+          colors=brewer.pal(8, "Dark2"))
+}
+```
+
+```{r}
+get_wordcloud_of_artist_songs("ABBA")
+```
+
+```{r}
+get_wordcloud_of_artist_songs("Rihanna")
+```
+
+```{r}
+get_wordcloud_of_artist_songs("Usher")
+```
 
 
